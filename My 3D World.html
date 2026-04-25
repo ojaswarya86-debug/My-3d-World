@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameHub | Ojasw Arya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%);
+            --bg-body: #f1f5f9;
+            --white: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+        }
+        header {
+            background: var(--white);
+            padding: 12px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-size: 24px; font-weight: 800; color: #4f46e5; }
+        .logo span { color: var(--text-main); }
+        .btn-add { 
+            background: var(--primary-gradient);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4); }
+        .hero-slider {
+            width: 100%; height: 320px;
+            background-size: cover;
+            background-position: center;
+            display: flex; align-items: center; justify-content: center;
+            transition: 1s ease-in-out;
+            position: relative;
+        }
+        .hero-overlay {
+            background: rgba(15, 23, 42, 0.5);
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            color: white; text-align: center;
+            backdrop-filter: blur(2px);
+        }
+        .hero-overlay h1 { font-size: 3rem; margin: 0; font-weight: 800; }
+        .main-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .section-title { font-size: 1.5rem; margin-bottom: 25px; font-weight: 700; }
+        #projects-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 24px; 
+        }
+        .project-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e2e8f0;
+            display: flex; flex-direction: column; align-items: flex-start;
+        }
+        .project-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: #4f46e5;
+        }
+        .badge {
+            background: #eef2ff; color: #4f46e5;
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 12px; font-weight: 600; margin-bottom: 12px;
+        }
+        .project-card h3 { margin: 0 0 8px 0; font-size: 1.25rem; }
+        .project-card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
+        .btn-play {
+            background: var(--primary-gradient);
+            color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; cursor: pointer; font-weight: 600;
+            width: 100%; transition: 0.2s;
+        }
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center; z-index: 5000;
+        }
+        .modal-box {
+            background: white; padding: 32px; border-radius: 24px;
+            width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .modal-box h2 { margin-top: 0; font-size: 1.5rem; color: #1e293b; }
+        .modal-box input {
+            width: 100%; padding: 14px; margin: 8px 0 16px 0;
+            border: 1px solid #cbd5e1; border-radius: 12px; outline: none;
+            box-sizing: border-box; font-size: 1rem;
+        }
+        .modal-box input:focus { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79,70,229,0.2); }
+        .helper-text { font-size: 0.8rem; color: var(--text-muted); margin: -12px 0 16px 0; }
+        #game-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #f1f5f9; display: none; flex-direction: column; z-index: 9999;
+        }
+        footer { padding: 60px; text-align: center; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid #e2e8f0; margin-top: 40px; }
+    </style>
+</head>
+<body>
+
+    <div id="game-overlay">
+        <button onclick="exitGame()" style="padding: 15px; background: #ef4444; color: white; border: none; font-weight: 700; cursor: pointer;">✕ CLOSE PROJECT</button>
+        <iframe id="game-frame" style="width:100%; flex-grow:1; border:none;" src=""></iframe>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-box">
+            <h2>New Project</h2>
+            <form id="pForm">
+                <input type="text" id="tInput" placeholder="Project Name" required>
+                <input type="url" id="uInput" placeholder="URL (https://... ya ./game.html)" required>
+                <p class="helper-text">Note: Local `file:///` path yahan kaam nahi karega. Game ko host karke URL daalo, ya `./My 3D World.html` jaise relative path use karo.</p>
+                <input type="text" id="dInput" placeholder="Developer Name" required>
+                <button type="button" class="btn-add" style="width:100%;" onclick="publish()">Publish Project</button>
+            </form>
+            <p onclick="toggleModal()" style="color: #64748b; cursor:pointer; margin-top:20px; font-weight:600;">Cancel</p>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">GAME<span>HUB</span></div>
+        <button class="btn-add" onclick="toggleModal()">+ Add Project</button>
+    </header>
+
+    <section class="hero-slider" id="slider">
+        <div class="hero-overlay">
+            <h1>Ojasw Arya</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">Professional Web Project Showcase</p>
+        </div>
+    </section>
+
+    <div class="main-container">
+        <h2 class="section-title">Active Projects</h2>
+        <div id="projects-grid"></div>
+    </div>
+
+    <footer>
+        <p>Developed & Maintained by <b>Ojasw Arya</b> — 2026</p>
+    </footer>
+
+    <script>
+        // 1. Slider Logic
+        const bgs = [
+            'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=1400',
+            'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1400'
+        ];
+        let bIdx = 0;
+        function rotateBg() {
+            const s = document.getElementById('slider');
+            if(s) {
+                s.style.backgroundImage = `url('${bgs[bIdx]}')`;
+                bIdx = (bIdx + 1) % bgs.length;
+            }
+        }
+        setInterval(rotateBg, 4500);
+        rotateBg();
+
+        // 2. Modal Toggle with Clear Logic
+        function toggleModal() {
+            const m = document.getElementById('modal');
+            const form = document.getElementById('pForm');
+            
+            if(m.style.display === 'flex') {
+                m.style.display = 'none';
+            } else {
+                form.reset();
+                m.style.display = 'flex';
+            }
+        }
+
+        // 3. Project Management - FIXED
+        function publish() {
+            const t = document.getElementById('tInput').value;
+            let u = document.getElementById('uInput').value.trim();
+            const d = document.getElementById('dInput').value;
+
+            if(!t || !u || !d) {
+                alert("Please fill all fields correctly!");
+                return;
+            }
+
+            // FIX 1: file:/// detect karo aur block karo
+            if (u.startsWith('file://')) {
+                alert("❌ Error: `file:///` wale local path iframe me nahi chalte.\n\n✅ Solution: \n1. Apna 'My 3D World.html' aur uske saare folders ko Netlify/GitHub pe upload karo\n2. Phir jo https URL mile ya `./My 3D World.html` jaisa relative path daalo");
+                return;
+            }
+
+            // FIX 2: Windows path C:\... ko relative banane ki koshish
+            if (u.match(/^[A-Z]:\\/i)) {
+                const fileName = u.split('\\').pop();
+                u = './' + fileName;
+                alert(`Path auto-fix: Maine path ko './${fileName}' kar diya hai.\nDhyan rahe: Ye tabhi chalega jab '${fileName}' is HTML file ke saath same folder me host hogi.`);
+            }
+
+            const projects = JSON.parse(localStorage.getItem('oj_pro_v1')) || [];
+            projects.push({t, u, d});
+            localStorage.setItem('oj_pro_v1', JSON.stringify(projects));
+            
+            render();
+            toggleModal();
+        }
+
+        function render() {
+            const grid = document.getElementById('projects-grid');
+            grid.innerHTML = '';
+            const data = JSON.parse(localStorage.getItem('oj_pro_v1')) || [];
+            
+            data.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.innerHTML = `
+                    <span class="badge">Web Project</span>
+                    <h3>${p.t}</h3>
+                    <p>Developer: ${p.d}</p>
+                    <button class="btn-play" onclick="launch('${p.u}')">LAUNCH PROJECT</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function launch(url) {
+            document.getElementById('game-frame').src = url;
+            document.getElementById('game-overlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function exitGame() {
+            document.getElementById('game-overlay').style.display = 'none';
+            document.getElementById('game-frame').src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onload = render;
+    </script>
+</body>
+</html>
